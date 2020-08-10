@@ -2,7 +2,8 @@
   <div class="twentytwenty-container"
     v-bind:style="containerStyle"
     v-on:touchstart="startSlide"
-    v-on:mousedown="startSlide">
+    v-on:mousedown="startSlide"
+    v-on:click.prevent>
 
     <img :src="after" alt="after"
       v-on:mousedown.prevent
@@ -29,6 +30,8 @@
 </template>
 
 <script>
+const clickDetectionDuration = 300;
+const clickDetectionDelta = 5;
 
 export default {
   data () {
@@ -37,7 +40,9 @@ export default {
       slideOffset: this.offset,
       sliding: false,
       containerStyle: {},
-      overlayStyle: {}
+      overlayStyle: {},
+      startTime: 0,
+      startPosition: 0
     }
   },
   props: {
@@ -70,11 +75,15 @@ export default {
     setDimensions () {
       const img = this.$el.querySelector("img")
       this.imgOffset = img.getBoundingClientRect()
-      this.containerStyle = { width: `${this.w}px`, height: `${this.h}px` };
+      this.containerStyle = { width: `${this.w}px`, height: `${this.h}px` }
     },
     startSlide (event) {
       this.sliding = true
-      this.moveSlide(event)
+      this.startTime = Date.now()
+      this.startPosition = this.getPosition(event)
+      if (!this.hasClick) {
+        this.moveSlide(event)
+      }
       this.overlayStyle = { opacity: 0 }
     },
     handleArrowNavigation(event) {
@@ -82,30 +91,45 @@ export default {
     },
     moveSlide (event) {
       if (this.sliding) {
-        var x = (event.touches ? event.touches[0].pageX : event.pageX) - this.imgOffset.left
+        var x = this.getPosition(event) - this.imgOffset.left
         x = (x < 0) ? 0 : ((x > this.w) ? this.w : x)
         return this.slideOffset = (x / this.w)
       }
       if (event.key) {
         switch(event.key) {
           case "Left":     // IE/Edge key
-          case "ArrowLeft":  this.slideOffset = ((this.floatOffset - this.floatKeyboardStep) >= 0) ? this.floatOffset - this.floatKeyboardStep : 0 ; break;
+          case "ArrowLeft":  this.slideOffset = Math.max(this.floatOffset - this.floatKeyboardStep, 0); break;
           case "Right":    // IE/Edge key
-          case "ArrowRight": this.slideOffset = ((this.floatOffset + this.floatKeyboardStep) <= 1) ? this.floatOffset + this.floatKeyboardStep : 1 ; break;
+          case "ArrowRight": this.slideOffset = Math.min(this.floatOffset + this.floatKeyboardStep, 1); break;
           default: return;
         }
       }
     },
-    endSlide () {
+    endSlide (event) {
+      if (
+        this.sliding &&
+        this.hasClick &&
+        (Date.now() - this.startTime) < clickDetectionDuration &&
+        Math.abs(this.startPosition - this.getPosition(event)) < clickDetectionDelta)
+      {
+        console.log(Date.now() - this.startTime, this.startPosition, this.getPosition(event), event)
+          this.$emit('click', event)
+      }
       this.sliding = false
       this.overlayStyle = {}
     },
     resize () {
-      this.containerStyle = {};
-      this.$nextTick(() => this.setDimensions());
+      this.containerStyle = {}
+      this.$nextTick(() => this.setDimensions())
+    },
+    getPosition(event) {
+      return (event.touches ? event.touches[0] : event.changedTouches ? event.changedTouches[0] : event).pageX
     }
   },
   computed: {
+    hasClick () {
+      return this.$listeners && !!this.$listeners.click
+    },
     beforeImgStyle () {
       return { clip: `rect(0, ${this.x}px, ${this.h}px, 0)` }
     },
@@ -128,7 +152,7 @@ export default {
       return this.imgOffset ? this.imgOffset.height : null
     },
     floatOffset () {
-      return parseFloat(this.slideOffset) 
+      return parseFloat(this.slideOffset)
     },
     floatKeyboardStep () {
       return parseFloat(this.keyboardStep)
