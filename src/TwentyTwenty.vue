@@ -112,7 +112,6 @@ export default {
         (Date.now() - this.startTime) < clickDetectionDuration &&
         Math.abs(this.startPosition - this.getPosition(event)) < clickDetectionDelta)
       {
-        console.log(Date.now() - this.startTime, this.startPosition, this.getPosition(event), event)
           this.$emit('click', event)
       }
       this.sliding = false
