@@ -1,28 +1,39 @@
 <template>
-  <div class="twentytwenty-container"
-    v-bind:style="containerStyle"
-    v-on:touchstart="startSlide"
-    v-on:mousedown="startSlide"
-    v-on:click.prevent>
+  <div
+    @touchstart="startSlide"
+    @mousedown="startSlide"
+    @click.prevent
+    :style="containerStyle"
+    class="twentytwenty-container"
+  >
+    <img
+      :src="after"
+      :alt="afterLabel"
+      @load="setDimensions"
+      @mousedown.prevent
+    />
 
-    <img :src="after" alt="after"
-      v-on:mousedown.prevent
-      v-on:load="setDimensions" />
+    <img
+      :src="before"
+      :alt="beforeLabel"
+      :style="beforeImgStyle"
+      @mousedown.prevent
+    />
 
-    <img :src="before" alt="before"
-      v-on:mousedown.prevent
-      v-bind:style="beforeImgStyle" />
-
-    <div class="twentytwenty-overlay"
-      v-bind:style="overlayStyle">
+    <div
+      class="twentytwenty-overlay"
+      :style="overlayStyle"
+    >
       <div v-if="beforeLabel" class="twentytwenty-before-label">{{beforeLabel}}</div>
       <div v-if="afterLabel" class="twentytwenty-after-label">{{afterLabel}}</div>
     </div>
 
-    <div class="twentytwenty-handle"
-      v-bind:style="handleStyle"
+    <div
+      class="twentytwenty-handle"
       tabindex="0"
-      v-on:keydown="handleArrowNavigation">
+      :style="handleStyle"
+      @keydown="handleArrowNavigation"
+    >
         <div class="twentytwenty-arrow-left"></div>
         <div class="twentytwenty-arrow-right"></div>
     </div>
@@ -42,7 +53,8 @@ export default {
       overlayStyle: {},
       startTime: 0,
       startPosition: 0,
-      shiftX: 0
+      shiftX: 0,
+      offset: this.value
     }
   },
   props: {
@@ -70,6 +82,11 @@ export default {
       validator: (value) => (value > 0 && value <= 1)
     }
   },
+  watch: {
+    value(to) {
+      this.offset = to;
+    }
+  },
   methods: {
     setDimensions () {
       const img = this.$el.querySelector("img")
@@ -93,19 +110,19 @@ export default {
       if (this.sliding) {
         let x = this.getPosition(event) - this.shiftX
         x = (x < 0) ? 0 : ((x > this.w) ? this.w : x)
-        this.value = (x / this.w)
-        this.$emit('input', this.value)
+        this.offset = (x / this.w)
+        this.$emit('input', this.offset)
         return
       }
       if (event.key) {
         switch(event.key) {
           case "Left":     // IE/Edge key
           case "ArrowLeft":
-            this.value = Math.max(this.floatOffset - this.floatKeyboardStep, 0);
+            this.offset = Math.max(this.floatOffset - this.floatKeyboardStep, 0);
             break;
           case "Right":    // IE/Edge key
           case "ArrowRight":
-            this.value = Math.min(this.floatOffset + this.floatKeyboardStep, 1);
+            this.offset = Math.min(this.floatOffset + this.floatKeyboardStep, 1);
             break;
           default:
             return;
@@ -134,7 +151,7 @@ export default {
   },
   computed: {
     hasClick () {
-      return this.$listeners && !!this.$listeners.click
+      return true;
     },
     beforeImgStyle () {
       return { clip: `rect(0, ${this.x}px, ${this.h}px, 0)` }
@@ -145,7 +162,7 @@ export default {
         width: `${size}px`,
         height: `${size}px`,
         top:  `calc(50% - ${size/2}px)`,
-        left: `calc(${this.value*100}% - ${size/2}px)`
+        left: `calc(${this.floatOffset*100}% - ${size/2}px)`
       }
     },
     x () {
@@ -158,7 +175,7 @@ export default {
       return this.imgOffset ? this.imgOffset.height : null
     },
     floatOffset () {
-      return Math.min(1, Math.max(0, parseFloat(this.value)))
+      return Math.min(1, Math.max(0, parseFloat(this.offset)))
     },
     floatKeyboardStep () {
       return parseFloat(this.keyboardStep)
@@ -196,6 +213,7 @@ export default {
   display: block;
   user-select: none;
   z-index: 20;
+  cursor: ew-resize;
 }
 .twentytwenty-container .twentytwenty-overlay {
   z-index: 25;
