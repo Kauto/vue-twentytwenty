@@ -3,3 +3,4 @@
 npm-debug.log
 /dist/*
 yarn-error.log
+.vscode
