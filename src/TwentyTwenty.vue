@@ -151,7 +151,7 @@ export default {
   },
   computed: {
     hasClick () {
-      return true;
+      return this.$listeners && !!this.$listeners.click;
     },
     beforeImgStyle () {
       return { clip: `rect(0, ${this.x}px, ${this.h}px, 0)` }
