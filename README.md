@@ -1,7 +1,7 @@
-# Vue-TwentyTwenty
+# Vue-TwentyTwenty-One
 
-[![npm](https://img.shields.io/npm/v/vue-twentytwenty.svg)
-![npm](https://img.shields.io/npm/dm/vue-twentytwenty.svg)](https://www.npmjs.com/package/vue-twentytwenty)
+[![npm](https://img.shields.io/npm/v/vue-twentytwenty-one.svg)
+![npm](https://img.shields.io/npm/dm/vue-twentytwenty-one.svg)](https://www.npmjs.com/package/vue-twentytwenty-one)
 [![vue2](https://img.shields.io/badge/vue-2.x-brightgreen.svg)](https://vuejs.org/)
 
 A small component to quickly let users see the differences between 2 images. This is a fork of [vue-twentytwenty](https://www.npmjs.com/package/vue-twentytwenty).
