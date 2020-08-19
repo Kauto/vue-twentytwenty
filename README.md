@@ -50,6 +50,7 @@ It can then be used like so:
 |afterLabel|When hovering over image what label should show up over after image|false|String|-|
 |value|How far from the left the slider should be on load (between 0 and 1)|false|Number|0.5|
 |keyboardStep|How far the slider should be moved on arrow key press (between 0 and 1)|false|Number|0.2|
+|lock|Locks the 20-20, so the offset can't be changed|false|Boolean|false|
 
 ## Events
 |Event|Description|

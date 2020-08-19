@@ -80,6 +80,10 @@ export default {
       type: [String, Number],
       default: 0.2,
       validator: (value) => (value > 0 && value <= 1)
+    },
+    lock: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -95,18 +99,25 @@ export default {
       this.containerStyle = { width: `${this.w}px`, height: `${this.h}px` }
     },
     startSlide (event) {
+      if (this.lock) {
+        return;
+      }
+
       this.sliding = true
       this.startTime = Date.now()
       this.startPosition = this.getPosition(event)
       if (!this.hasClick) {
         this.moveSlide(event)
       }
-      this.overlayStyle = { opacity: 0 }
+      this.overlayStyle = { opacity: 0, cursor: 'ew-resize' }
     },
     handleArrowNavigation(event) {
       if (this.keyboardStep) this.moveSlide(event)
     },
     moveSlide (event) {
+      if (this.lock) {
+        return;
+      }
       if (this.sliding) {
         let x = this.getPosition(event) - this.shiftX
         x = (x < 0) ? 0 : ((x > this.w) ? this.w : x)
@@ -131,10 +142,12 @@ export default {
     },
     endSlide (event) {
       if (
-        this.sliding &&
-        this.hasClick &&
-        (Date.now() - this.startTime) < clickDetectionDuration &&
-        Math.abs(this.startPosition - this.getPosition(event)) < clickDetectionDelta)
+        !this.sliding ||
+        (
+          this.hasClick &&
+          (Date.now() - this.startTime) < clickDetectionDuration &&
+          Math.abs(this.startPosition - this.getPosition(event)) < clickDetectionDelta)
+        )
       {
           this.$emit('click', event)
       }
@@ -213,7 +226,6 @@ export default {
   display: block;
   user-select: none;
   z-index: 20;
-  cursor: ew-resize;
 }
 .twentytwenty-container .twentytwenty-overlay {
   z-index: 25;
@@ -221,7 +233,7 @@ export default {
   height: 100%;
   top: 0;
   position: absolute;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.2);
   opacity: 0;
   transition-property: opacity;
   transition-duration: 0.5s;
