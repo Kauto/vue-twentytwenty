@@ -1,6 +1,6 @@
 {
   "name": "vue-twentytwenty-one",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "./dist/vue-twentytwenty-one.common.js",
   "author": "Markus Madeja",
   "contributors": [
