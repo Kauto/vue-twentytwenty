@@ -37,12 +37,12 @@ export default {
   data () {
     return {
       imgOffset: null,
-      slideOffset: this.offset,
       sliding: false,
       containerStyle: {},
       overlayStyle: {},
       startTime: 0,
-      startPosition: 0
+      startPosition: 0,
+      shiftX: 0
     }
   },
   props: {
@@ -60,10 +60,9 @@ export default {
     afterLabel: {
       type: String
     },
-    offset: {
+    value: {
       type: [String, Number],
-      default: 0.5,
-      validator: (value) => (value > 0 && value <= 1)
+      default: 0.5
     },
     keyboardStep: {
       type: [String, Number],
@@ -75,6 +74,7 @@ export default {
     setDimensions () {
       const img = this.$el.querySelector("img")
       this.imgOffset = img.getBoundingClientRect()
+      this.shiftX = this.imgOffset.left + (this.$el.getBoundingClientRect().width - this.imgOffset.width) / 2;
       this.containerStyle = { width: `${this.w}px`, height: `${this.h}px` }
     },
     startSlide (event) {
@@ -87,21 +87,28 @@ export default {
       this.overlayStyle = { opacity: 0 }
     },
     handleArrowNavigation(event) {
-      return this.moveSlide(event)
+      if (this.keyboardStep) this.moveSlide(event)
     },
     moveSlide (event) {
       if (this.sliding) {
-        var x = this.getPosition(event) - this.imgOffset.left
+        let x = this.getPosition(event) - this.shiftX
         x = (x < 0) ? 0 : ((x > this.w) ? this.w : x)
-        return this.slideOffset = (x / this.w)
+        this.value = (x / this.w)
+        this.$emit('input', this.value)
+        return
       }
       if (event.key) {
         switch(event.key) {
           case "Left":     // IE/Edge key
-          case "ArrowLeft":  this.slideOffset = Math.max(this.floatOffset - this.floatKeyboardStep, 0); break;
+          case "ArrowLeft":
+            this.value = Math.max(this.floatOffset - this.floatKeyboardStep, 0);
+            break;
           case "Right":    // IE/Edge key
-          case "ArrowRight": this.slideOffset = Math.min(this.floatOffset + this.floatKeyboardStep, 1); break;
-          default: return;
+          case "ArrowRight":
+            this.value = Math.min(this.floatOffset + this.floatKeyboardStep, 1);
+            break;
+          default:
+            return;
         }
       }
     },
@@ -138,11 +145,11 @@ export default {
         width: `${size}px`,
         height: `${size}px`,
         top:  `calc(50% - ${size/2}px)`,
-        left: `calc(${this.slideOffset*100}% - ${size/2}px)`
+        left: `calc(${this.value*100}% - ${size/2}px)`
       }
     },
     x () {
-      return this.w * this.slideOffset
+      return this.w * this.floatOffset
     },
     w () {
       return this.imgOffset ? this.imgOffset.width : null
@@ -151,7 +158,7 @@ export default {
       return this.imgOffset ? this.imgOffset.height : null
     },
     floatOffset () {
-      return parseFloat(this.slideOffset)
+      return Math.min(1, Math.max(0, parseFloat(this.value)))
     },
     floatKeyboardStep () {
       return parseFloat(this.keyboardStep)

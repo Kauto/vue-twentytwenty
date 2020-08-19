@@ -2,7 +2,7 @@
   <div class="container">
     <h2>Demo</h2>
     <TwentyTwenty
-      offset="0.7"
+      v-model="offset"
       keyboardStep="0.1"
       before="//placehold.it/600x200/E8117F/FFFFFF"
       beforeLabel="before"
@@ -17,6 +17,11 @@
   export default {
     components: {
       TwentyTwenty
+    },
+    data() {
+      return {
+        offset: 0.7
+      }
     }
   }
 </script>
