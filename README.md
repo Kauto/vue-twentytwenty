@@ -15,7 +15,7 @@ $ npm install vue-twentytwenty-one
 ##git  Usage
 
 ```js
-import 'vue-twentytwenty/dist/vue-twentytwenty-one.css';
+import 'vue-twentytwenty-one/dist/vue-twentytwenty-one.css';
 import TwentyTwenty from 'vue-twentytwenty-one';
 
 export default {
