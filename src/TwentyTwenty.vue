@@ -50,7 +50,6 @@ export default {
       imgOffset: null,
       sliding: false,
       containerStyle: {},
-      overlayStyle: {},
       startTime: 0,
       startPosition: 0,
       shiftX: 0,
@@ -109,7 +108,6 @@ export default {
       if (!this.hasClick) {
         this.moveSlide(event)
       }
-      this.overlayStyle = { opacity: 0, cursor: 'ew-resize' }
     },
     handleArrowNavigation(event) {
       if (this.keyboardStep) this.moveSlide(event)
@@ -152,7 +150,6 @@ export default {
           this.$emit('click', event)
       }
       this.sliding = false
-      this.overlayStyle = {}
     },
     resize () {
       this.containerStyle = {}
@@ -192,6 +189,13 @@ export default {
     },
     floatKeyboardStep () {
       return parseFloat(this.keyboardStep)
+    },
+    overlayStyle() {
+      return {
+        cursor: this.hasClick ? 'pointer' : 'move',
+        opacity: this.sliding ? 1 : 0,
+        background: !(this.beforeLabel || this.afterLabel) ? 'transparent' : undefined
+      };
     }
   },
   mounted () {
@@ -233,7 +237,7 @@ export default {
   height: 100%;
   top: 0;
   position: absolute;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.8);
   opacity: 0;
   transition-property: opacity;
   transition-duration: 0.5s;
@@ -264,9 +268,13 @@ export default {
   background: none;
   border: 4px solid white;
   border-radius: 50px;
-  margin-left: -4px;
-  margin-top: -4px;
+  margin-left: -2px;
+  margin-top: -2px;
   user-select: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px;
 }
 .twentytwenty-container .twentytwenty-handle:active,
 .twentytwenty-container .twentytwenty-handle:focus {
@@ -288,20 +296,15 @@ export default {
 .twentytwenty-container .twentytwenty-arrow-right,
 .twentytwenty-container .twentytwenty-arrow-left {
   user-select: none;
-  position: relative;
   width: 0;
   height: 0;
 }
 .twentytwenty-container .twentytwenty-arrow-right {
-  bottom: 10px;
-  left: 23px;
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
   border-left: 10px solid white;
 }
 .twentytwenty-container .twentytwenty-arrow-left {
-  top: 10px;
-  left: 7px;
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
   border-right: 10px solid white;
