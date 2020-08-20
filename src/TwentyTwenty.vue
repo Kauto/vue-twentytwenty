@@ -140,12 +140,11 @@ export default {
     },
     endSlide (event) {
       if (
-        !this.sliding ||
-        (
-          this.hasClick &&
-          (Date.now() - this.startTime) < clickDetectionDuration &&
-          Math.abs(this.startPosition - this.getPosition(event)) < clickDetectionDelta)
-        )
+        this.sliding &&
+        this.hasClick &&
+        (Date.now() - this.startTime) < clickDetectionDuration &&
+        Math.abs(this.startPosition - this.getPosition(event)) < clickDetectionDelta
+      )
       {
           this.$emit('click', event)
       }
@@ -268,8 +267,8 @@ export default {
   background: none;
   border: 4px solid white;
   border-radius: 50px;
-  margin-left: -2px;
-  margin-top: -2px;
+  margin-left: -1px;
+  margin-top: -1px;
   user-select: none;
   display: flex;
   justify-content: space-between;
